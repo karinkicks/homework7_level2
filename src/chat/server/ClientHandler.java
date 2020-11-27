@@ -1,10 +1,13 @@
 package chat.server;
 
+import chat.db.DBService;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.sql.Connection;
 import java.util.Objects;
 
 
@@ -46,10 +49,10 @@ public class ClientHandler {
     }
 
     private void doAuth() throws SocketTimeoutException {
-
         try {
-                socket.setSoTimeout(3000);
+                socket.setSoTimeout(300000);
             while (true) {
+
                     String credentials = in.readUTF();
 
                     /**

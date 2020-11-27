@@ -1,6 +1,7 @@
 package chat.server;
 
 import chat.auth.AuthenticationService;
+import chat.auth.AuthenticationServiceDB;
 import chat.auth.BasicAuthenticationService;
 
 import java.io.DataInputStream;
@@ -22,7 +23,7 @@ public class ChatServer implements Server {
             System.out.println("Server is starting up...");
             ServerSocket serverSocket = new ServerSocket(8888);
             clients = new HashSet<>();
-            authenticationService = new BasicAuthenticationService();
+            authenticationService = new AuthenticationServiceDB();
             System.out.println("Server is started up...");
 
             while (true) {
