@@ -37,7 +37,7 @@ public class AuthenticationServiceDB implements AuthenticationService {
             }
             return Optional.empty();
         } catch (SQLException throwables) {
-            throw new RuntimeException("SWW during Fruit find by id", throwables);
+            throw new RuntimeException("SWW", throwables);
         } finally {
             DBService.close(connection);
         }

@@ -4,9 +4,7 @@ import chat.auth.AuthenticationService;
 import chat.auth.AuthenticationServiceDB;
 import chat.auth.BasicAuthenticationService;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashSet;
@@ -17,6 +15,9 @@ public class ChatServer implements Server {
     private AuthenticationService authenticationService;
     private DataInputStream in;
     private DataOutputStream out;
+    private File file = new File("C://Users//Карина//IdeaProjects//homework7_level2//LogFile.txt");
+    private BufferedReader reader;
+    private BufferedWriter writer;
 
     public ChatServer() {
         try {
@@ -25,6 +26,12 @@ public class ChatServer implements Server {
             clients = new HashSet<>();
             authenticationService = new AuthenticationServiceDB();
             System.out.println("Server is started up...");
+            writer = new BufferedWriter(new FileWriter(file));
+            try {
+                boolean create = file.createNewFile();
+            } catch (IOException e) {
+                throw new RuntimeException("Ошибка при создании файла");
+            }
 
             while (true) {
                 System.out.println("Server is listening for clients...");
@@ -78,5 +85,40 @@ public class ChatServer implements Server {
     @Override
     public AuthenticationService getAuthenticationService() {
         return authenticationService;
+    }
+
+    @Override
+    public synchronized void addLog(String message) {
+        try{
+
+            writer.write(message);
+            writer.write("\n");
+            writer.flush();
+        } catch (IOException e) {
+            throw new RuntimeException("Ошибка при записи в файл");
+        }
+    }
+
+    @Override
+    public void showLog() {
+
+        if(!file.exists()) {
+            System.out.println("Нет такого файла");
+            return;
+        }
+        int amountOfLine=0;
+        try {
+            reader = new BufferedReader(new FileReader(file));
+            out.writeUTF("--Начало истории чата--");
+            while (amountOfLine<=100 && reader.ready()==true){
+                out.writeUTF(reader.readLine());
+                amountOfLine++;
+            }
+            out.writeUTF("--Конец истории чата--");
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 }

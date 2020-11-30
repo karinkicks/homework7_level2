@@ -1,8 +1,6 @@
 package chat;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 import java.util.Scanner;
 
@@ -12,6 +10,8 @@ public class ClientApp {
             Socket socket = new Socket("localhost", 8888);
             DataInputStream in = new DataInputStream(socket.getInputStream());
             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+
+
 
            new Thread(() -> {
                 try {
@@ -24,11 +24,11 @@ public class ClientApp {
                 }
             }).start();
 
-           Scanner scanner = new Scanner(System.in);
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
             while (true) {
                 try {
                     System.out.println("...");
-                    out.writeUTF(scanner.nextLine());
+                    out.writeUTF(bufferedReader.readLine());
                 } catch (IOException e) {
                     throw new RuntimeException("SWW", e);
                 }

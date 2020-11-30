@@ -8,4 +8,6 @@ public interface Server {
     void subscribe(ClientHandler client);
     void unsubscribe(ClientHandler client);
     AuthenticationService getAuthenticationService();
+    void addLog(String message);
+    void showLog();
 }

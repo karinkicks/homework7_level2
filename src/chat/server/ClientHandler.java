@@ -38,6 +38,7 @@ public class ClientHandler {
     private void doListen() {
         new Thread(() -> {
             try {
+                server.showLog();
                 doAuth();
                 receiveMessage();
             } catch (SocketTimeoutException e) {
@@ -107,13 +108,13 @@ public class ClientHandler {
      */
     private void receiveMessage() {
         try {
-            sendMessage("receiveMessage");
             while (true) {
                String message = in.readUTF();
                 if (message.equals("-exit")) {
                     return;
                 }
                 server.broadcastMessage(message);
+                server.addLog(message);
             }
         } catch (Exception e) {
             throw new RuntimeException("SWW", e);
