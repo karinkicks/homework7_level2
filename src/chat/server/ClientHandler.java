@@ -122,6 +122,7 @@ public class ClientHandler {
                     return;
                 }
                 server.broadcastMessage(message);
+                logger.addLog(message);
             }
         } catch (Exception e) {
             throw new RuntimeException("SWW", e);
