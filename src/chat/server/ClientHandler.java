@@ -1,6 +1,8 @@
 package chat.server;
 
 import chat.db.DBService;
+import chat.logging.Logger;
+import com.mysql.jdbc.jmx.LoadBalanceConnectionGroupManager;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -18,13 +20,14 @@ public class ClientHandler {
     private DataOutputStream out;
     private String name;
     boolean flag =false;
+    private Logger logger;
+
     public ClientHandler(Server server, Socket socket) {
         try {
             this.server = server;
             this.socket = socket;
             in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
-
             doListen();
         } catch (IOException e) {
             throw new RuntimeException("SWW", e);
@@ -38,8 +41,13 @@ public class ClientHandler {
     private void doListen() {
         new Thread(() -> {
             try {
-                server.showLog();
                 doAuth();
+                logger = new Logger(socket, name);
+                try {
+                    logger.showLog();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 receiveMessage();
             } catch (SocketTimeoutException e) {
                 e.getStackTrace();
@@ -71,11 +79,10 @@ public class ClientHandler {
                                 .ifPresentOrElse(
                                         user -> {
                                             if (!server.isLoggedIn(user.getNickname())) {
-                                                sendMessage("cmd auth: Status OK");
                                                 name = user.getNickname();
                                                 server.broadcastMessage(name + " is logged in.");
                                                 server.subscribe(this);
-                                                sendMessage("cmd auth: Status OK");
+                                                sendMessage("cmd auth: Status OK "+ name);
                                                 flag = true;
                                             } else {
                                                 sendMessage("Current user is already logged in.");
@@ -111,10 +118,10 @@ public class ClientHandler {
             while (true) {
                String message = in.readUTF();
                 if (message.equals("-exit")) {
+                    server.unsubscribe(this);
                     return;
                 }
                 server.broadcastMessage(message);
-                server.addLog(message);
             }
         } catch (Exception e) {
             throw new RuntimeException("SWW", e);
@@ -123,6 +130,8 @@ public class ClientHandler {
 
     public void sendMessage(String message) {
         try {
+            if(flag){
+            logger.addLog(message);}
             out.writeUTF(message);
         } catch (IOException e) {
             throw new RuntimeException("SWW", e);

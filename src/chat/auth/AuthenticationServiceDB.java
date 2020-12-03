@@ -29,11 +29,6 @@ public class AuthenticationServiceDB implements AuthenticationService {
                               resultSet.getString("email"),
                                 resultSet.getString("password")
                         ));
-                //return new Optional<User>(
-                 //       resultSet.getString("nickname"),
-                  //      resultSet.getString("email"),
-//                );
-
             }
             return Optional.empty();
         } catch (SQLException throwables) {
